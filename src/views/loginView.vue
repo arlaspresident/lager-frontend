@@ -1,48 +1,50 @@
 <template>
-  <div class="bg-carcare carcare-login">
-    <div class="login-container">
-      <div class="text-center mb-5">
-        <h1 class="carcare-title">CarCare</h1>
-        <p class="carcare-subtitle">Warehouse System</p>
+  <div class="bg-carcare d-flex align-items-center justify-content-center min-vh-100">
+    <div class="card border-warning bg-dark" style="width: 100%; max-width: 400px">
+      <div class="card-body p-5">
+        <div class="text-center mb-5">
+          <h1 class="text-warning mb-0" style="font-size: 3rem; font-weight: 700; letter-spacing: 2px">CarCare</h1>
+          <p class="text-muted mb-0 mt-3">Warehouse System</p>
+        </div>
+
+        <form @submit.prevent="onLogin">
+          <div class="mb-3">
+            <label for="email" class="form-label text-light">Email</label>
+            <input
+              id="email"
+              v-model="email"
+              type="email"
+              class="form-control bg-dark text-light border-warning"
+              placeholder="din@email.se"
+              required
+            />
+          </div>
+
+          <div class="mb-4">
+            <label for="password" class="form-label text-light">Lösenord</label>
+            <input
+              id="password"
+              v-model="password"
+              type="password"
+              class="form-control bg-dark text-light border-warning"
+              placeholder="••••••"
+              required
+            />
+          </div>
+
+          <button type="submit" class="btn btn-warning w-100 fw-bold mb-3">
+            Logga in
+          </button>
+
+          <div v-if="error" class="alert alert-danger mb-0">{{ error }}</div>
+          <div v-if="message" class="alert alert-success mb-0">{{ message }}</div>
+        </form>
+
+        <hr class="border-warning border-opacity-25 my-4" />
+        <p class="text-center text-light small mb-0">
+          Test: admin@carcare.se / test123
+        </p>
       </div>
-
-      <form @submit.prevent="onLogin">
-        <div class="mb-3">
-          <label for="email" class="form-label">Email</label>
-          <input
-            id="email"
-            v-model="email"
-            type="email"
-            class="form-control"
-            placeholder="din@email.se"
-            required
-          />
-        </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label">Lösenord</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            class="form-control"
-            placeholder="••••••"
-            required
-          />
-        </div>
-
-        <button type="submit" class="btn btn-carcare w-100 mb-3">
-          Logga in
-        </button>
-
-        <p v-if="error" class="alert alert-danger">{{ error }}</p>
-        <p v-if="message" class="alert alert-success">{{ message }}</p>
-      </form>
-
-      <hr />
-      <p class="text-center text-muted small">
-        Test: admin@carcare.se / test123
-      </p>
     </div>
   </div>
 </template>
@@ -77,89 +79,30 @@ async function onLogin() {
 
 <style scoped>
 .bg-carcare {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
-.carcare-login {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-container {
-  background: rgba(26, 26, 26, 0.85);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(244, 208, 63, 0.2);
-  border-radius: 12px;
-  padding: 3rem 2rem;
-  width: 100%;
-  max-width: 400px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-}
-
-.carcare-title {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #F4D03F;
-  margin: 0;
-  letter-spacing: 2px;
-}
-
-.carcare-subtitle {
-  color: #aaa;
-  font-size: 0.95rem;
-  margin-top: 0.5rem;
-  font-weight: 300;
-}
-
-.form-control {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(244, 208, 63, 0.3);
+.form-control:focus {
+  background-color: rgba(255, 255, 255, 0.1);
   color: white;
-  font-size: 0.95rem;
+  border-color: #F4D03F;
+  box-shadow: 0 0 0 0.2rem rgba(244, 208, 63, 0.25);
 }
 
 .form-control::placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
-.form-control:focus {
-  background: rgba(255, 255, 255, 0.12);
-  border-color: #F4D03F;
-  box-shadow: 0 0 0 0.2rem rgba(244, 208, 63, 0.25);
-  color: white;
-}
-
-.form-label {
-  color: #ddd;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-}
-
-.btn-carcare {
-  background-color: #F4D03F;
-  color: #1a1a1a;
-  border: none;
-  font-weight: 600;
-  padding: 0.75rem 1.5rem;
-  transition: all 0.3s ease;
-}
-
-.btn-carcare:hover {
+.btn-warning:hover {
   background-color: #e8c427;
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(244, 208, 63, 0.3);
 }
 
-hr {
-  border-color: rgba(244, 208, 63, 0.2);
-}
-
-.text-muted {
-  color: rgba(255, 255, 255, 0.5) !important;
+.card {
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 </style>
