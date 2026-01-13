@@ -14,6 +14,30 @@
 
       <!-- lista eller edit -->
       <div v-if="editingId === null">
+
+  <div class="card border-warning mb-5 bg-dark">
+    <div class="card-header bg-dark border-warning d-flex justify-content-between align-items-center">
+      <h2 class="text-warning mb-0">Kategorier</h2>
+      <button @click="showAddCategory = !showAddCategory" class="btn btn-sm btn-outline-warning">
+        {{ showAddCategory ? 'Dölj' : '+ Ny kategori' }}
+      </button>
+    </div>
+    <div class="card-body">
+      <div v-if="showAddCategory" class="mb-4 pb-4 border-bottom border-warning border-opacity-25">
+        <div class="d-flex gap-2">
+          <input
+            v-model="newCategoryName"
+            type="text"
+            class="form-control bg-dark text-light border-warning"
+            placeholder="Kategorinamn"
+            @keyup.enter="addCategory"
+          />
+          <button @click="addCategory" class="btn btn-warning fw-bold">Lägg till</button>
+        </div>
+        <p v-if="categoryError" class="alert alert-danger mt-2 mb-0">{{ categoryError }}</p>
+      </div>
+    </div>
+  </div>
         <!-- skapa -->
         <div class="card border-warning mb-5 bg-dark">
           <div class="card-header bg-dark border-warning">
@@ -200,7 +224,8 @@ import {
   logout,
   createProduct,
   deleteProduct,
-  updateProduct
+  updateProduct,
+  createCategory,
 } from '../services/api'
 
 const products = ref([])
@@ -332,6 +357,29 @@ async function onUpdate() {
     editForm.value = null
   } catch (err) {
     error.value = err.message
+  }
+}
+
+
+const showAddCategory = ref(false)
+const newCategoryName = ref('')
+const categoryError = ref('')
+
+async function addCategory() {
+  categoryError.value = ''
+  
+  if (!newCategoryName.value.trim()) {
+    categoryError.value = 'Kategorinamn kan inte vara tomt'
+    return
+  }
+  
+  try {
+    const created = await createCategory(newCategoryName.value)
+    categories.value.push(created)
+    newCategoryName.value = ''
+    showAddCategory.value = false
+  } catch (err) {
+    categoryError.value = err.message
   }
 }
 </script>

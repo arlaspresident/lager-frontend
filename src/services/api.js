@@ -108,3 +108,18 @@ export async function updateProduct(id, data) {
   if (!response.ok) throw new Error(`Update failed: ${response.status}`)
   return response.json()
 }
+
+//skapa ny kategori
+export async function createCategory(name) {
+  const response = await fetch('/api/categories', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders()
+    },
+    body: JSON.stringify({ name })
+  })
+
+  if (!response.ok) throw new Error(`Create category failed: ${response.status}`)
+  return response.json()
+}
