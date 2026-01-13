@@ -1,16 +1,20 @@
-function getHeaders() {
+const API_BASE = '/api'
+
+
+function authHeaders() {
   const token = localStorage.getItem('token')
-  return {
-    'Content-Type': 'application/json',
-    Authorization: token ? `Bearer ${token}` : ''
-  }
+  return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-export async function getProducts() {
-  const res = await fetch('/api/products', {
-    headers: getHeaders()
+//auth
+export async function login(email, password) {
+  const res = await fetch(`${API_BASE}/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email, password })
   })
-  if (!res.ok) throw new Error('Kunde inte hämta produkter')
+
+  if (!res.ok) throw new Error('Fel email eller lösenord')
   return res.json()
 }
 
@@ -18,12 +22,24 @@ export function logout() {
   localStorage.removeItem('token')
 }
 
+//produkter
+export async function getProducts() {
+  const res = await fetch(`${API_BASE}/products`, {
+    headers: {
+      ...authHeaders()
+    }
+  })
+
+  if (!res.ok) throw new Error('Kunde inte hämta produkter')
+  return res.json()
+}
+
 export async function updateStock(productId, delta) {
-  const res = await fetch(`/api/products/${productId}/stock`, {
+  const res = await fetch(`${API_BASE}/products/${productId}/stock`, {
     method: 'PATCH',
     headers: {
-      ...authHeaders(),
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      ...authHeaders()
     },
     body: JSON.stringify({ delta })
   })
