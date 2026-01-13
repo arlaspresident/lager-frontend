@@ -84,3 +84,27 @@ export async function deleteProduct(id) {
 
   return { id }
 }
+
+//hämta kategorier
+export async function getCategories() {
+  const response = await fetch('/api/categories', {
+    headers: authHeaders()
+  })
+  if (!response.ok) throw new Error('Kunde inte hämta kategorier')
+  return response.json()
+}
+
+//uppdatera produkt
+export async function updateProduct(id, data) {
+  const response = await fetch(`/api/products/${id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders()
+    },
+    body: JSON.stringify(data)
+  })
+
+  if (!response.ok) throw new Error(`Update failed: ${response.status}`)
+  return response.json()
+}
