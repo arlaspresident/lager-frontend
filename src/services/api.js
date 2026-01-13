@@ -17,3 +17,21 @@ export async function getProducts() {
 export function logout() {
   localStorage.removeItem('token')
 }
+
+export async function updateStock(productId, delta) {
+  const res = await fetch(`/api/products/${productId}/stock`, {
+    method: 'PATCH',
+    headers: {
+      ...authHeaders(),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ delta })
+  })
+
+  if (!res.ok) {
+    const msg = await res.json().catch(() => null)
+    throw new Error(msg?.error || 'Kunde inte uppdatera lagersaldo')
+  }
+
+  return res.json()
+}
