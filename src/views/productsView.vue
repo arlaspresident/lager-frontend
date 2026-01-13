@@ -1,6 +1,7 @@
 <template>
   <div>
     <h1>Produkter</h1>
+    <button @click="onLogout">Logga ut</button>
 
     <ul>
       <li v-for="p in products" :key="p.id">
@@ -26,4 +27,14 @@ onMounted(async () => {
     error.value = err.message
   }
 })
+import { useRouter } from 'vue-router'
+import { logout } from '../services/api'
+
+const router = useRouter()
+
+function onLogout() {
+  logout()
+  router.push('/')
+}
+
 </script>

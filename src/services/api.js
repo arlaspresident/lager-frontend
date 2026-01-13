@@ -13,3 +13,7 @@ export async function getProducts() {
   if (!res.ok) throw new Error('Kunde inte hämta produkter')
   return res.json()
 }
+
+export function logout() {
+  localStorage.removeItem('token')
+}
