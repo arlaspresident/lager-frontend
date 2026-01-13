@@ -51,3 +51,36 @@ export async function updateStock(productId, delta) {
 
   return res.json()
 }
+
+//skapa produkt
+export async function createProduct(payload) {
+  const res = await fetch(`${API_BASE}/products`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeaders()
+    },
+    body: JSON.stringify(payload)
+  })
+
+  if (!res.ok) {
+    const msg = await res.json().catch(() => null)
+    throw new Error(msg?.error || 'Kunde inte skapa produkt')
+  }
+
+  return res.json()
+}
+
+//radera produkt
+export async function deleteProduct(id) {
+  const response = await fetch(`/api/products/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders()
+  })
+
+  if (!response.ok) {
+    throw new Error(`Delete failed: ${response.status}`)
+  }
+
+  return { id }
+}
