@@ -6,7 +6,7 @@
         <div class="card-body d-flex justify-content-between align-items-center">
           <div>
             <h1 class="text-warning mb-0" style="font-size: 2.5rem; font-weight: 700">CarCare Warehouse</h1>
-            <p class="text-muted mb-0 mt-2">Lagerhanterings system</p>
+            <p class="text-light mb-0 mt-2">Lagerhanterings system</p>
           </div>
           <button @click="onLogout" class="btn btn-outline-warning">Logga ut</button>
         </div>
@@ -83,27 +83,27 @@
                     <span class="badge bg-warning text-dark">{{ p.sku }}</span>
                   </div>
 
-                  <p class="card-text text-muted small mb-3">{{ p.description || 'Ingen beskrivning' }}</p>
+                  <p class="card-text text-light small mb-3">{{ p.description || 'Ingen beskrivning' }}</p>
 
                   <div class="mb-3 pb-3 border-bottom border-warning border-opacity-25">
                     <div class="row text-center">
                       <div class="col-4">
-                        <small class="text-muted">Plats</small>
+                        <small class="text-light">Plats</small>
                         <p class="text-light mb-0">{{ p.location || '-' }}</p>
                       </div>
                       <div class="col-4">
-                        <small class="text-muted">Pris</small>
+                        <small class="text-light">Pris</small>
                         <p class="text-light mb-0">{{ p.price ? p.price + ' kr' : '-' }}</p>
                       </div>
                       <div class="col-4">
-                        <small class="text-muted">Kat.</small>
+                        <small class="text-light">Kat.</small>
                         <p class="text-light mb-0 small">{{ p.category_name || '-' }}</p>
                       </div>
                     </div>
                   </div>
 
                   <div class="mb-3">
-                    <small class="text-muted">Lagersaldo</small>
+                    <small class="text-light">Lagersaldo</small>
                     <div class="d-flex align-items-center gap-2 mt-2">
                       <button @click="changeStock(p.id, -1)" class="btn btn-sm btn-outline-warning">−</button>
                       <span class="text-light fw-bold flex-grow-1 text-center">{{ p.quantity }} st</span>
