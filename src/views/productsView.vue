@@ -260,6 +260,15 @@ async function onCreate() {
       category_id: form.value.category_id,
       is_active: 1
     })
+    
+    //lägg till category name
+    if (created.category_id) {
+      const cat = categories.value.find(c => c.id === created.category_id)
+      if (cat) {
+        created.category_name = cat.name
+      }
+    }
+    
     products.value.unshift(created)
     form.value = { sku: '', name: '', description: '', location: '', price: null, quantity: 0, category_id: null }
   } catch (err) {
@@ -304,6 +313,17 @@ async function onUpdate() {
       category_id: editForm.value.category_id,
       is_active: editForm.value.is_active
     })
+    
+    //lägg till category name från categories listan
+    if (updated.category_id) {
+      const cat = categories.value.find(c => c.id === updated.category_id)
+      if (cat) {
+        updated.category_name = cat.name
+      }
+    } else {
+      updated.category_name = null
+    }
+    
     const idx = products.value.findIndex(p => p.id === editingId.value)
     if (idx !== -1) {
       products.value[idx] = updated
