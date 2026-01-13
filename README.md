@@ -1,44 +1,47 @@
-# .
+# CarCare Warehouse - Frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Vue.js baserad SPA för lagerhanterings system. Gränssnittet låter lagerpersonal hantera produkter, kategorier och lagersaldo
 
-## Recommended IDE Setup
+## Tekniker
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Vue.js 3** – Frontend ramverk
+- **Vue Router** – SPA routing
+- **Bootstrap 5** – CSS ramverk
+- **Vite** – Build tool
 
-## Recommended Browser Setup
+## Installation & Start
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+### Förutsättningar
+- Node.js (v16+)
+- Backend API körs på `http://localhost:3000`
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
+### Installera beroenden
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
-
-```sh
+### Starta utvecklingsserver
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
+Appen körs på `http://localhost:5173`
 
-```sh
+### Build för produktion
+```bash
 npm run build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+## Konfiguration
 
-```sh
-npm run lint
+### API-proxy
+Vite är konfigurerat att proxya `/api/*` till backend:
 ```
+http://localhost:5173/api/... → http://localhost:3000/...
+```
+
+#### Login (`/`)
+- Email + lösenord inloggning
+- JWT token sparas i localstorage
+- Validering av inmatning
+- Test konto: `admin@carcare.se` / `test123`
