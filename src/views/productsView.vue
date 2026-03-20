@@ -1,214 +1,48 @@
 <template>
   <div class="bg-carcare min-vh-100 py-5">
     <div class="container">
-      <!-- header -->
-      <div class="card border-warning mb-5 bg-dark">
-        <div class="card-body d-flex justify-content-between align-items-center">
-          <div>
-            <h1 class="text-warning mb-0" style="font-size: 2.5rem; font-weight: 700">CarCare Warehouse</h1>
-            <p class="text-light mb-0 mt-2">Lagerhanterings system</p>
-          </div>
-          <button @click="onLogout" class="btn btn-outline-warning">Logga ut</button>
-        </div>
-      </div>
 
-      <!-- lista eller edit -->
-      <div v-if="editingId === null">
+      <AppHeader @logout="onLogout" />
 
-  <div class="card border-warning mb-5 bg-dark">
-    <div class="card-header bg-dark border-warning d-flex justify-content-between align-items-center">
-      <h2 class="text-warning mb-0">Kategorier</h2>
-      <button @click="showAddCategory = !showAddCategory" class="btn btn-sm btn-outline-warning">
-        {{ showAddCategory ? 'Dölj' : '+ Ny kategori' }}
-      </button>
-    </div>
-    <div class="card-body">
-      <div v-if="showAddCategory" class="mb-4 pb-4 border-bottom border-warning border-opacity-25">
-        <div class="d-flex gap-2">
-          <input
-            v-model="newCategoryName"
-            type="text"
-            class="form-control bg-dark text-light border-warning"
-            placeholder="Kategorinamn"
-            @keyup.enter="addCategory"
-          />
-          <button @click="addCategory" class="btn btn-warning fw-bold">Lägg till</button>
-        </div>
-        <p v-if="categoryError" class="alert alert-danger mt-2 mb-0">{{ categoryError }}</p>
-      </div>
-    </div>
-  </div>
-        <!-- skapa -->
-        <div class="card border-warning mb-5 bg-dark">
-          <div class="card-header bg-dark border-warning">
-            <h2 class="text-warning mb-0">Lägg till produkt</h2>
-          </div>
-          <div class="card-body">
-            <form @submit.prevent="onCreate">
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label class="form-label text-light">SKU</label>
-                  <input v-model="form.sku" class="form-control bg-dark text-light border-warning" required />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label text-light">Namn</label>
-                  <input v-model="form.name" class="form-control bg-dark text-light border-warning" required />
-                </div>
-              </div>
+      <CategoryManager :categories="categories" @category-added="onCategoryAdded" />
 
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label class="form-label text-light">Beskrivning</label>
-                  <input v-model="form.description" class="form-control bg-dark text-light border-warning" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label text-light">Plats</label>
-                  <input v-model="form.location" class="form-control bg-dark text-light border-warning" />
-                </div>
-              </div>
+      <!-- skapa produkt -->
+      <ProductForm
+        v-if="editingId === null"
+        :categories="categories"
+        title="Lägg till produkt"
+        submit-label="Skapa produkt"
+        @submit="onCreate"
+      />
 
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label class="form-label text-light">Pris</label>
-                  <input v-model.number="form.price" type="number" class="form-control bg-dark text-light border-warning" />
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label text-light">Antal</label>
-                  <input v-model.number="form.quantity" type="number" min="0" class="form-control bg-dark text-light border-warning" />
-                </div>
-              </div>
+      <!-- redigera produkt -->
+      <ProductForm
+        v-else
+        :categories="categories"
+        :initial-data="editForm"
+        :title="'Redigera: ' + editForm.name"
+        submit-label="Spara ändringar"
+        :show-cancel="true"
+        @submit="onUpdate"
+        @cancel="cancelEdit"
+      />
 
-              <div class="row mb-3">
-                <div class="col-md-6">
-                  <label class="form-label text-light">Kategori</label>
-                  <select v-model.number="form.category_id" class="form-select bg-dark text-light border-warning">
-                    <option :value="null">Ingen kategori</option>
-                    <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                      {{ cat.name }}
-                    </option>
-                  </select>
-                </div>
-              </div>
-
-              <button type="submit" class="btn btn-warning fw-bold">Skapa produkt</button>
-            </form>
+      <!-- produktlista -->
+      <div>
+        <h2 class="text-warning mb-4">Produkter ({{ products.length }})</h2>
+        <div class="row g-3">
+          <div v-for="p in products" :key="p.id" class="col-lg-4 col-md-6">
+            <ProductCard
+              :product="p"
+              @change-stock="(delta) => changeStock(p.id, delta)"
+              @edit="startEdit"
+              @delete="onDelete"
+            />
           </div>
         </div>
-
-        <!-- produkter -->
-        <div>
-          <h2 class="text-warning mb-4">Produkter ({{ products.length }})</h2>
-          <div class="row g-3">
-            <div v-for="p in products" :key="p.id" class="col-lg-4 col-md-6">
-              <div class="card border-warning bg-dark h-100 hover-card">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <h5 class="card-title text-warning mb-0">{{ p.name }}</h5>
-                    <span class="badge bg-warning text-dark">{{ p.sku }}</span>
-                  </div>
-
-                  <p class="card-text text-light small mb-3">{{ p.description || 'Ingen beskrivning' }}</p>
-
-                  <div class="mb-3 pb-3 border-bottom border-warning border-opacity-25">
-                    <div class="row text-center">
-                      <div class="col-4">
-                        <small class="text-light">Plats</small>
-                        <p class="text-light mb-0">{{ p.location || '-' }}</p>
-                      </div>
-                      <div class="col-4">
-                        <small class="text-light">Pris</small>
-                        <p class="text-light mb-0">{{ p.price ? p.price + ' kr' : '-' }}</p>
-                      </div>
-                      <div class="col-4">
-                        <small class="text-light">Kat.</small>
-                        <p class="text-light mb-0 small">{{ p.category_name || '-' }}</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div class="mb-3">
-                    <small class="text-light">Lagersaldo</small>
-                    <div class="d-flex align-items-center gap-2 mt-2">
-                      <button @click="changeStock(p.id, -1)" class="btn btn-sm btn-outline-warning">−</button>
-                      <span class="text-light fw-bold flex-grow-1 text-center">{{ p.quantity }} st</span>
-                      <button @click="changeStock(p.id, 1)" class="btn btn-sm btn-outline-warning">+</button>
-                    </div>
-                  </div>
-
-                  <div class="d-grid gap-2">
-                    <button @click="startEdit(p)" class="btn btn-sm btn-outline-warning">Redigera</button>
-                    <button @click="onDelete(p.id)" class="btn btn-sm btn-outline-danger">Radera</button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <p v-if="products.length === 0" class="text-muted text-center py-5">Inga produkter ännu</p>
-        </div>
+        <p v-if="products.length === 0" class="text-muted text-center py-5">Inga produkter ännu</p>
       </div>
 
-      <!-- redigera form -->
-      <div v-else class="card border-warning mb-5 bg-dark">
-        <div class="card-header bg-dark border-warning">
-          <h2 class="text-warning mb-0">Redigera: {{ editForm.name }}</h2>
-        </div>
-        <div class="card-body">
-          <form @submit.prevent="onUpdate">
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label class="form-label text-light">SKU</label>
-                <input v-model="editForm.sku" class="form-control bg-dark text-light border-warning" required />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label text-light">Namn</label>
-                <input v-model="editForm.name" class="form-control bg-dark text-light border-warning" required />
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label class="form-label text-light">Beskrivning</label>
-                <input v-model="editForm.description" class="form-control bg-dark text-light border-warning" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label text-light">Plats</label>
-                <input v-model="editForm.location" class="form-control bg-dark text-light border-warning" />
-              </div>
-            </div>
-
-            <div class="row mb-3">
-              <div class="col-md-6">
-                <label class="form-label text-light">Pris</label>
-                <input v-model.number="editForm.price" type="number" class="form-control bg-dark text-light border-warning" />
-              </div>
-              <div class="col-md-6">
-                <label class="form-label text-light">Antal</label>
-                <input v-model.number="editForm.quantity" type="number" min="0" class="form-control bg-dark text-light border-warning" />
-              </div>
-            </div>
-
-            <div class="row mb-4">
-              <div class="col-md-6">
-                <label class="form-label text-light">Kategori</label>
-                <select v-model.number="editForm.category_id" class="form-select bg-dark text-light border-warning">
-                  <option :value="null">Ingen kategori</option>
-                  <option v-for="cat in categories" :key="cat.id" :value="cat.id">
-                    {{ cat.name }}
-                  </option>
-                </select>
-              </div>
-            </div>
-
-            <div class="d-flex gap-2">
-              <button type="submit" class="btn btn-warning fw-bold">Spara ändringar</button>
-              <button type="button" @click="cancelEdit" class="btn btn-outline-secondary">Avbryt</button>
-            </div>
-          </form>
-        </div>
-      </div>
-
-      <!--error-->
       <div v-if="error" class="alert alert-danger mt-3">{{ error }}</div>
     </div>
   </div>
@@ -217,16 +51,11 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  getProducts,
-  getCategories,
-  updateStock,
-  logout,
-  createProduct,
-  deleteProduct,
-  updateProduct,
-  createCategory,
-} from '../services/api'
+import { getProducts, getCategories, updateStock, logout, createProduct, deleteProduct, updateProduct } from '../services/api'
+import AppHeader from '../components/AppHeader.vue'
+import CategoryManager from '../components/CategoryManager.vue'
+import ProductForm from '../components/ProductForm.vue'
+import ProductCard from '../components/ProductCard.vue'
 
 const products = ref([])
 const categories = ref([])
@@ -234,16 +63,6 @@ const error = ref('')
 const router = useRouter()
 const editingId = ref(null)
 const editForm = ref(null)
-
-const form = ref({
-  sku: '',
-  name: '',
-  description: '',
-  location: '',
-  price: null,
-  quantity: 0,
-  category_id: null
-})
 
 onMounted(async () => {
   try {
@@ -259,6 +78,10 @@ function onLogout() {
   router.push('/')
 }
 
+function onCategoryAdded(category) {
+  categories.value.push(category)
+}
+
 async function changeStock(id, delta) {
   error.value = ''
   try {
@@ -272,39 +95,33 @@ async function changeStock(id, delta) {
   }
 }
 
-async function onCreate() {
+async function onCreate(formData) {
   error.value = ''
   try {
     const created = await createProduct({
-      sku: form.value.sku,
-      name: form.value.name,
-      description: form.value.description || null,
-      location: form.value.location || null,
-      price: form.value.price === '' ? null : form.value.price,
-      quantity: form.value.quantity ?? 0,
-      category_id: form.value.category_id,
+      sku: formData.sku,
+      name: formData.name,
+      description: formData.description || null,
+      location: formData.location || null,
+      price: formData.price === '' ? null : formData.price,
+      quantity: formData.quantity ?? 0,
+      category_id: formData.category_id,
       is_active: 1
     })
-    
-    //lägg till category name
+
     if (created.category_id) {
       const cat = categories.value.find(c => c.id === created.category_id)
-      if (cat) {
-        created.category_name = cat.name
-      }
+      if (cat) created.category_name = cat.name
     }
-    
+
     products.value.unshift(created)
-    form.value = { sku: '', name: '', description: '', location: '', price: null, quantity: 0, category_id: null }
   } catch (err) {
     error.value = err.message
   }
 }
 
 async function onDelete(id) {
-  if (!confirm('Är du säker? Denna åtgärd kan inte ångras.')) {
-    return
-  }
+  if (!confirm('Är du säker? Denna åtgärd kan inte ångras.')) return
   error.value = ''
   try {
     await deleteProduct(id)
@@ -324,86 +141,39 @@ function cancelEdit() {
   editForm.value = null
 }
 
-async function onUpdate() {
-  if (!editForm.value) return
+async function onUpdate(formData) {
   error.value = ''
   try {
     const updated = await updateProduct(editingId.value, {
-      sku: editForm.value.sku,
-      name: editForm.value.name,
-      description: editForm.value.description || null,
-      location: editForm.value.location || null,
-      price: editForm.value.price === '' ? null : editForm.value.price,
-      quantity: editForm.value.quantity ?? 0,
-      category_id: editForm.value.category_id,
-      is_active: editForm.value.is_active
+      sku: formData.sku,
+      name: formData.name,
+      description: formData.description || null,
+      location: formData.location || null,
+      price: formData.price === '' ? null : formData.price,
+      quantity: formData.quantity ?? 0,
+      category_id: formData.category_id,
+      is_active: formData.is_active
     })
-    
-    //lägg till category name från categories listan
+
     if (updated.category_id) {
       const cat = categories.value.find(c => c.id === updated.category_id)
-      if (cat) {
-        updated.category_name = cat.name
-      }
+      updated.category_name = cat ? cat.name : null
     } else {
       updated.category_name = null
     }
-    
+
     const idx = products.value.findIndex(p => p.id === editingId.value)
-    if (idx !== -1) {
-      products.value[idx] = updated
-    }
+    if (idx !== -1) products.value[idx] = updated
+
     editingId.value = null
     editForm.value = null
   } catch (err) {
     error.value = err.message
   }
 }
-
-
-const showAddCategory = ref(false)
-const newCategoryName = ref('')
-const categoryError = ref('')
-
-async function addCategory() {
-  categoryError.value = ''
-  
-  if (!newCategoryName.value.trim()) {
-    categoryError.value = 'Kategorinamn kan inte vara tomt'
-    return
-  }
-  
-  try {
-    const created = await createCategory(newCategoryName.value)
-    categories.value.push(created)
-    newCategoryName.value = ''
-    showAddCategory.value = false
-  } catch (err) {
-    categoryError.value = err.message
-  }
-}
 </script>
 
 <style scoped>
-.hover-card {
-  transition: all 0.3s ease;
-  cursor: default;
-}
-
-.hover-card:hover {
-  border-color: rgba(244, 208, 63, 0.8) !important;
-  box-shadow: 0 8px 20px rgba(244, 208, 63, 0.2);
-  transform: translateY(-4px);
-}
-
-.form-control:focus,
-.form-select:focus {
-  background-color: #2d2d2d;
-  color: white;
-  border-color: #F4D03F;
-  box-shadow: 0 0 0 0.2rem rgba(244, 208, 63, 0.25);
-}
-
 .btn-warning:hover {
   background-color: #e8c427;
   border-color: #e8c427;
